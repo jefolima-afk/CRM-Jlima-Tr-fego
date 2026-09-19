@@ -87,46 +87,58 @@ export const FinancialView: React.FC<FinancialViewProps> = ({ onSelectClient }) 
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-xs">
-              {filteredClients.map((client) => {
-                const fin = financialRecords.find((f) => f.clientId === client.id);
-                return (
-                  <tr key={client.id} className="hover:bg-slate-50">
-                    <td className="px-4 py-3 font-semibold text-slate-900">
-                      <button
-                        type="button"
-                        onClick={() => onSelectClient(client.id, 'financeiro')}
-                        className="hover:text-blue-600 text-left"
-                      >
-                        {client.corporateName}
-                      </button>
-                      <div className="text-[11px] text-slate-400">{client.segment || '-'}</div>
-                    </td>
-                    <td className="px-4 py-3 font-bold font-mono text-emerald-700 text-sm">
-                      {formatBRL(client.contractedValue || fin?.monthlyValue || 0)}
-                    </td>
-                    <td className="px-4 py-3 text-slate-600">
-                      {client.paymentMethod || 'Boleto / Pix'}
-                    </td>
-                    <td className="px-4 py-3 font-mono text-slate-600">
-                      Todo dia {fin?.dueDateDay || 10}
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className="px-2.5 py-0.5 text-xs font-bold rounded-full bg-emerald-100 text-emerald-800">
-                        {fin?.status || 'Em dia'}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      <button
-                        type="button"
-                        onClick={() => onSelectClient(client.id, 'financeiro')}
-                        className="text-xs font-semibold text-blue-600 hover:underline"
-                      >
-                        Ver Histórico
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
+              {filteredClients.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="py-14 text-center text-slate-400">
+                    <DollarSign size={36} className="mx-auto text-slate-300 mb-2" />
+                    <div className="font-semibold text-slate-700 text-xs">Nenhum cliente ativo para faturamento</div>
+                    <div className="text-[11px] text-slate-400 mt-0.5">
+                      Quando você cadastrar clientes com contratos ou mensalidades, os dados financeiros aparecerão aqui.
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+                filteredClients.map((client) => {
+                  const fin = financialRecords.find((f) => f.clientId === client.id);
+                  return (
+                    <tr key={client.id} className="hover:bg-slate-50">
+                      <td className="px-4 py-3 font-semibold text-slate-900">
+                        <button
+                          type="button"
+                          onClick={() => onSelectClient(client.id, 'financeiro')}
+                          className="hover:text-blue-600 text-left"
+                        >
+                          {client.corporateName}
+                        </button>
+                        <div className="text-[11px] text-slate-400">{client.segment || '-'}</div>
+                      </td>
+                      <td className="px-4 py-3 font-bold font-mono text-emerald-700 text-sm">
+                        {formatBRL(client.contractedValue || fin?.monthlyValue || 0)}
+                      </td>
+                      <td className="px-4 py-3 text-slate-600">
+                        {client.paymentMethod || 'Boleto / Pix'}
+                      </td>
+                      <td className="px-4 py-3 font-mono text-slate-600">
+                        Todo dia {fin?.dueDateDay || 10}
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className="px-2.5 py-0.5 text-xs font-bold rounded-full bg-emerald-100 text-emerald-800">
+                          {fin?.status || 'Em dia'}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <button
+                          type="button"
+                          onClick={() => onSelectClient(client.id, 'financeiro')}
+                          className="text-xs font-semibold text-blue-600 hover:underline"
+                        >
+                          Ver Histórico
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
             </tbody>
           </table>
         </div>

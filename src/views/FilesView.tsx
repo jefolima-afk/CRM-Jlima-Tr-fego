@@ -181,88 +181,107 @@ export const FilesView: React.FC<FilesViewProps> = ({ onSelectClient }) => {
       </div>
 
       {/* Grid of Files */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {filteredFiles.map((file) => {
-          const client = clients.find((c) => c.id === file.clientId);
-          const uploader = users.find((u) => u.id === file.uploadedByUserId);
-
-          return (
-            <div
-              key={file.id}
-              className="bg-white rounded-xl border border-slate-200 p-4 shadow-2xs hover:border-blue-300 transition-all flex flex-col justify-between space-y-3"
+      {filteredFiles.length === 0 ? (
+        <div className="py-16 text-center bg-white rounded-xl border border-slate-200 p-8">
+          <FolderOpen size={40} className="mx-auto text-slate-300 mb-2" />
+          <h3 className="font-semibold text-slate-800 text-sm">Nenhum arquivo armazenado</h3>
+          <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+            Faça upload de contratos, briefings, propostas e comprovantes vinculados aos clientes.
+          </p>
+          {canEdit && (
+            <button
+              type="button"
+              onClick={() => setIsUploadModalOpen(true)}
+              className="mt-4 inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition-colors"
             >
-              <div>
-                <div className="flex items-center justify-between text-[11px] mb-2">
-                  <span className="font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded">
-                    {file.category}
-                  </span>
-                  <span className="text-slate-400 font-mono">{file.fileSize}</span>
-                </div>
+              <Upload size={15} /> Enviar Primeiro Arquivo
+            </button>
+          )}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {filteredFiles.map((file) => {
+            const client = clients.find((c) => c.id === file.clientId);
+            const uploader = users.find((u) => u.id === file.uploadedByUserId);
 
-                <div className="font-bold text-xs text-slate-900 line-clamp-2" title={file.name}>
-                  {file.name}
-                </div>
+            return (
+              <div
+                key={file.id}
+                className="bg-white rounded-xl border border-slate-200 p-4 shadow-2xs hover:border-blue-300 transition-all flex flex-col justify-between space-y-3"
+              >
+                <div>
+                  <div className="flex items-center justify-between text-[11px] mb-2">
+                    <span className="font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded">
+                      {file.category}
+                    </span>
+                    <span className="text-slate-400 font-mono">{file.fileSize}</span>
+                  </div>
 
-                {file.description && (
-                  <p className="text-[11px] text-slate-500 mt-1 line-clamp-2">{file.description}</p>
-                )}
+                  <div className="font-bold text-xs text-slate-900 line-clamp-2" title={file.name}>
+                    {file.name}
+                  </div>
 
-                {client && (
-                  <button
-                    type="button"
-                    onClick={() => onSelectClient(client.id, 'arquivos')}
-                    className="mt-2 text-[11px] font-semibold text-blue-600 hover:underline flex items-center gap-1 truncate"
-                  >
-                    <Building2 size={11} /> {client.corporateName}
-                  </button>
-                )}
+                  {file.description && (
+                    <p className="text-[11px] text-slate-500 mt-1 line-clamp-2">{file.description}</p>
+                  )}
 
-                <div className="text-[10px] text-slate-400 mt-2 font-mono">
-                  Upload por {uploader?.name || 'Equipe'} em {formatDate(file.uploadDate)}
-                </div>
-              </div>
-
-              {/* Actions: Preview, Download, Delete */}
-              <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  {file.fileDataUrl && file.fileType.startsWith('image/') && (
+                  {client && (
                     <button
                       type="button"
-                      onClick={() => setPreviewFile(file)}
-                      className="text-xs font-semibold text-slate-600 hover:text-blue-600 inline-flex items-center gap-1"
+                      onClick={() => onSelectClient(client.id, 'arquivos')}
+                      className="mt-2 text-[11px] font-semibold text-blue-600 hover:underline flex items-center gap-1 truncate"
                     >
-                      <Eye size={13} /> Ver
+                      <Building2 size={11} /> {client.corporateName}
                     </button>
                   )}
 
-                  {file.fileDataUrl ? (
-                    <a
-                      href={file.fileDataUrl}
-                      download={file.name}
-                      className="text-xs font-semibold text-blue-600 hover:underline inline-flex items-center gap-1"
-                    >
-                      <Download size={13} /> Baixar
-                    </a>
-                  ) : (
-                    <span className="text-xs text-slate-400">Armazenado</span>
-                  )}
+                  <div className="text-[10px] text-slate-400 mt-2 font-mono">
+                    Upload por {uploader?.name || 'Equipe'} em {formatDate(file.uploadDate)}
+                  </div>
                 </div>
 
-                {canEdit && (
-                  <button
-                    type="button"
-                    onClick={() => deleteFile(file.id)}
-                    className="text-slate-400 hover:text-red-600 p-1"
-                    title="Excluir arquivo"
-                  >
-                    <Trash2 size={14} />
-                  </button>
-                )}
+                {/* Actions: Preview, Download, Delete */}
+                <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    {file.fileDataUrl && file.fileType.startsWith('image/') && (
+                      <button
+                        type="button"
+                        onClick={() => setPreviewFile(file)}
+                        className="text-xs font-semibold text-slate-600 hover:text-blue-600 inline-flex items-center gap-1"
+                      >
+                        <Eye size={13} /> Ver
+                      </button>
+                    )}
+
+                    {file.fileDataUrl ? (
+                      <a
+                        href={file.fileDataUrl}
+                        download={file.name}
+                        className="text-xs font-semibold text-blue-600 hover:underline inline-flex items-center gap-1"
+                      >
+                        <Download size={13} /> Baixar
+                      </a>
+                    ) : (
+                      <span className="text-xs text-slate-400">Armazenado</span>
+                    )}
+                  </div>
+
+                  {canEdit && (
+                    <button
+                      type="button"
+                      onClick={() => deleteFile(file.id)}
+                      className="text-slate-400 hover:text-red-600 p-1"
+                      title="Excluir arquivo"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* Upload Modal */}
       {isUploadModalOpen && (

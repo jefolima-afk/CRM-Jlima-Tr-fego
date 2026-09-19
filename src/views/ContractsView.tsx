@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShieldCheck, Plus, Search, Building2, Calendar, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { ShieldCheck, Plus, Search, Building2, Calendar, AlertTriangle, CheckCircle2, FileCheck } from 'lucide-react';
 import { useCrm } from '../context/CrmContext';
 import { formatBRL, formatDate, isDateOverdue, getTodayString } from '../utils/formatters';
 
@@ -87,91 +87,110 @@ export const ContractsView: React.FC<ContractsViewProps> = ({ onSelectClient }) 
       </div>
 
       {/* Contracts Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {filteredContracts.map((ctr) => {
-          const client = clients.find((c) => c.id === ctr.clientId);
-          const isExpiring = (() => {
-            const today = new Date();
-            const end = new Date(ctr.endDate);
-            const diffDays = (end.getTime() - today.getTime()) / (1000 * 3600 * 24);
-            return diffDays <= 45 && diffDays >= 0;
-          })();
-
-          return (
-            <div
-              key={ctr.id}
-              className={`bg-white rounded-xl border p-5 shadow-2xs transition-all flex flex-col justify-between space-y-3 ${
-                isExpiring ? 'border-orange-300 bg-orange-50/20' : 'border-slate-200 hover:border-blue-300'
-              }`}
+      {filteredContracts.length === 0 ? (
+        <div className="py-16 text-center bg-white rounded-xl border border-slate-200 p-8">
+          <FileCheck size={40} className="mx-auto text-slate-300 mb-2" />
+          <h3 className="font-semibold text-slate-800 text-sm">Nenhum contrato ativo ou cadastrado</h3>
+          <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+            Cadastre contratos vigentes para controlar mensalidades, renovações e prazos de serviços.
+          </p>
+          {canEdit && (
+            <button
+              type="button"
+              onClick={() => setIsModalOpen(true)}
+              className="mt-4 inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition-colors"
             >
-              <div>
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <h3 className="font-bold text-base text-slate-900 leading-snug">
-                      {ctr.serviceName}
-                    </h3>
-                    {client && (
-                      <button
-                        type="button"
-                        onClick={() => onSelectClient(client.id, 'contratos')}
-                        className="text-xs font-semibold text-blue-600 hover:underline flex items-center gap-1.5 mt-1"
-                      >
-                        <Building2 size={13} /> {client.corporateName}
-                      </button>
-                    )}
+              <Plus size={15} /> Cadastrar Primeiro Contrato
+            </button>
+          )}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {filteredContracts.map((ctr) => {
+            const client = clients.find((c) => c.id === ctr.clientId);
+            const isExpiring = (() => {
+              const today = new Date();
+              const end = new Date(ctr.endDate);
+              const diffDays = (end.getTime() - today.getTime()) / (1000 * 3600 * 24);
+              return diffDays <= 45 && diffDays >= 0;
+            })();
+
+            return (
+              <div
+                key={ctr.id}
+                className={`bg-white rounded-xl border p-5 shadow-2xs transition-all flex flex-col justify-between space-y-3 ${
+                  isExpiring ? 'border-orange-300 bg-orange-50/20' : 'border-slate-200 hover:border-blue-300'
+                }`}
+              >
+                <div>
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <h3 className="font-bold text-base text-slate-900 leading-snug">
+                        {ctr.serviceName}
+                      </h3>
+                      {client && (
+                        <button
+                          type="button"
+                          onClick={() => onSelectClient(client.id, 'contratos')}
+                          className="text-xs font-semibold text-blue-600 hover:underline flex items-center gap-1.5 mt-1"
+                        >
+                          <Building2 size={13} /> {client.corporateName}
+                        </button>
+                      )}
+                    </div>
+
+                    <span
+                      className={`px-2.5 py-0.5 text-xs font-bold rounded-full ${
+                        ctr.status === 'active'
+                          ? 'bg-emerald-100 text-emerald-800'
+                          : 'bg-slate-100 text-slate-700'
+                      }`}
+                    >
+                      {ctr.status === 'active' ? 'Vigente' : 'Encerrado'}
+                    </span>
                   </div>
 
-                  <span
-                    className={`px-2.5 py-0.5 text-xs font-bold rounded-full ${
-                      ctr.status === 'active'
-                        ? 'bg-emerald-100 text-emerald-800'
-                        : 'bg-slate-100 text-slate-700'
-                    }`}
+                  {isExpiring && (
+                    <div className="mt-2.5 p-2 rounded-lg bg-orange-100/80 border border-orange-300 text-orange-900 text-xs font-semibold flex items-center gap-1.5">
+                      <AlertTriangle size={14} className="shrink-0" />
+                      Contrato próximo do vencimento! Preparar renovação.
+                    </div>
+                  )}
+
+                  <div className="mt-3 space-y-1.5 text-xs text-slate-600">
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-500">Valor Contratual:</span>
+                      <strong className="text-sm font-mono text-emerald-700">{formatBRL(ctr.value)}</strong>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-500">Início:</span>
+                      <span className="font-mono">{formatDate(ctr.startDate)}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-500">Vencimento:</span>
+                      <strong className="font-mono text-slate-900">{formatDate(ctr.endDate)}</strong>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-500">Cláusula de Renovação:</span>
+                      <span>{ctr.renewal}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-3 border-t border-slate-100 flex items-center justify-end">
+                  <button
+                    type="button"
+                    onClick={() => onSelectClient(ctr.clientId, 'contratos')}
+                    className="text-xs font-semibold text-blue-600 hover:underline"
                   >
-                    {ctr.status === 'active' ? 'Vigente' : 'Encerrado'}
-                  </span>
-                </div>
-
-                {isExpiring && (
-                  <div className="mt-2.5 p-2 rounded-lg bg-orange-100/80 border border-orange-300 text-orange-900 text-xs font-semibold flex items-center gap-1.5">
-                    <AlertTriangle size={14} className="shrink-0" />
-                    Contrato próximo do vencimento! Preparar renovação.
-                  </div>
-                )}
-
-                <div className="mt-3 space-y-1.5 text-xs text-slate-600">
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-500">Valor Contratual:</span>
-                    <strong className="text-sm font-mono text-emerald-700">{formatBRL(ctr.value)}</strong>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-500">Início:</span>
-                    <span className="font-mono">{formatDate(ctr.startDate)}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-500">Vencimento:</span>
-                    <strong className="font-mono text-slate-900">{formatDate(ctr.endDate)}</strong>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-500">Cláusula de Renovação:</span>
-                    <span>{ctr.renewal}</span>
-                  </div>
+                    Abrir ficha do contrato
+                  </button>
                 </div>
               </div>
-
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-end">
-                <button
-                  type="button"
-                  onClick={() => onSelectClient(ctr.clientId, 'contratos')}
-                  className="text-xs font-semibold text-blue-600 hover:underline"
-                >
-                  Abrir ficha do contrato
-                </button>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* Modal Novo Contato */}
       {isModalOpen && (

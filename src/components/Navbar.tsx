@@ -12,6 +12,7 @@ import {
   FileWarning,
   Menu,
   CheckCircle2,
+  LogOut,
 } from 'lucide-react';
 import { useCrm } from '../context/CrmContext';
 import { UserRole } from '../types';
@@ -29,7 +30,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onNavigate,
   onToggleSidebar,
 }) => {
-  const { currentUser, setCurrentUser, users, stats, followUps, tasks, contracts } = useCrm();
+  const { currentUser, setCurrentUser, users, stats, followUps, tasks, contracts, logout } = useCrm();
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
@@ -305,6 +306,21 @@ export const Navbar: React.FC<NavbarProps> = ({
                 {currentUser.role === 'admin' && 'Acesso total a cadastros, exclusões e configurações.'}
                 {currentUser.role === 'collaborator' && 'Pode criar clientes, contatos, tarefas e follow-ups.'}
                 {currentUser.role === 'viewer' && 'Modo somente leitura para consultas e auditoria.'}
+              </div>
+
+              <div className="mt-2 pt-2 border-t border-slate-100">
+                <button
+                  id="btn-navbar-logout"
+                  type="button"
+                  onClick={() => {
+                    setShowUserMenu(false);
+                    logout();
+                  }}
+                  className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-left text-xs text-rose-600 hover:bg-rose-50 font-medium transition-colors cursor-pointer"
+                >
+                  <LogOut size={14} />
+                  <span>Sair do Sistema</span>
+                </button>
               </div>
             </div>
           )}

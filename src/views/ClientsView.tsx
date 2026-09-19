@@ -283,10 +283,22 @@ export const ClientsView: React.FC<ClientsViewProps> = ({
       {filteredClients.length === 0 && (
         <div className="py-16 text-center bg-white rounded-xl border border-slate-200 p-8">
           <Building2 size={40} className="mx-auto text-slate-300 mb-2" />
-          <h3 className="font-semibold text-slate-800 text-sm">Nenhum cliente ou lead encontrado</h3>
+          <h3 className="font-semibold text-slate-800 text-sm">Nenhum cliente ou lead cadastrado</h3>
           <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
-            Tente redefinir os filtros de busca ou cadastre um novo cliente no botão acima.
+            Sua base está limpa e pronta para receber seus clientes e leads comerciais.
           </p>
+          {canEdit && (
+            <button
+              type="button"
+              onClick={() => {
+                setClientToEdit(null);
+                setIsModalOpen(true);
+              }}
+              className="mt-4 inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition-colors"
+            >
+              <Plus size={15} /> Cadastrar Primeiro Cliente
+            </button>
+          )}
         </div>
       )}
 

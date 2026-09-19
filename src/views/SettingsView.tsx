@@ -117,21 +117,29 @@ export const SettingsView: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-xs text-slate-500">Alternar usuário ativo:</span>
-          <select
-            value={currentUser.id}
-            onChange={(e) => {
-              const u = users.find((usr) => usr.id === e.target.value);
-              if (u) setCurrentUser(u);
-            }}
-            className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-300 bg-white"
-          >
-            {users.map((u) => (
-              <option key={u.id} value={u.id}>
-                {u.name} ({u.roleLabel || u.role})
-              </option>
-            ))}
-          </select>
+          {users.length > 1 ? (
+            <>
+              <span className="text-xs text-slate-500">Alternar usuário:</span>
+              <select
+                value={currentUser.id}
+                onChange={(e) => {
+                  const u = users.find((usr) => usr.id === e.target.value);
+                  if (u) setCurrentUser(u);
+                }}
+                className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-300 bg-white"
+              >
+                {users.map((u) => (
+                  <option key={u.id} value={u.id}>
+                    {u.name} ({u.roleLabel || u.role})
+                  </option>
+                ))}
+              </select>
+            </>
+          ) : (
+            <span className="text-xs font-medium px-2.5 py-1 bg-purple-100 text-purple-800 rounded-lg border border-purple-200">
+              Usuário único: <strong className="font-mono">admin</strong>
+            </span>
+          )}
         </div>
       </div>
 

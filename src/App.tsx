@@ -31,9 +31,10 @@ import { FinancialView } from './views/FinancialView';
 import { FilesView } from './views/FilesView';
 import { ReportsView } from './views/ReportsView';
 import { SettingsView } from './views/SettingsView';
+import { LoginView } from './views/LoginView';
 
 const CrmApp: React.FC = () => {
-  const { currentUser, users, setCurrentUser, stats, clients, canEdit } = useCrm();
+  const { currentUser, users, setCurrentUser, stats, clients, canEdit, isAuthenticated } = useCrm();
 
   // Navigation state
   const [currentView, setCurrentView] = useState<string>('dashboard');
@@ -53,6 +54,11 @@ const CrmApp: React.FC = () => {
   // Global search modal
   const [globalSearchOpen, setGlobalSearchOpen] = useState(false);
   const [globalQuery, setGlobalQuery] = useState('');
+
+  // Authentication barrier: If not authenticated, display LoginView
+  if (!isAuthenticated) {
+    return <LoginView />;
+  }
 
   // Handle client selection
   const handleSelectClient = (clientId: string, initialTab?: string) => {

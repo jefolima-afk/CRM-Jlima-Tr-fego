@@ -190,9 +190,21 @@ export const TasksView: React.FC<TasksViewProps> = ({
       {/* Tasks List */}
       <div className="bg-white rounded-xl border border-slate-200 shadow-2xs divide-y divide-slate-100 overflow-hidden">
         {filteredTasks.length === 0 ? (
-          <div className="py-12 text-center text-slate-400 text-xs">
-            <CheckCircle2 size={32} className="mx-auto text-slate-300 mb-2" />
-            Nenhuma tarefa encontrada para este filtro.
+          <div className="py-14 text-center text-slate-400 text-xs">
+            <CheckCircle2 size={36} className="mx-auto text-slate-300 mb-2" />
+            <div className="font-semibold text-slate-700 text-xs">Nenhuma tarefa cadastrada</div>
+            <p className="text-[11px] text-slate-400 mt-0.5 max-w-xs mx-auto">
+              Mantenha sua rotina comercial e operacional organizada criando tarefas com prazos e checklists.
+            </p>
+            {canEdit && (
+              <button
+                type="button"
+                onClick={() => setIsModalOpen(true)}
+                className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition-colors"
+              >
+                <Plus size={14} /> Criar Primeira Tarefa
+              </button>
+            )}
           </div>
         ) : (
           filteredTasks.map((t) => {

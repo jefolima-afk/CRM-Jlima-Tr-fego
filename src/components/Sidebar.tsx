@@ -20,6 +20,7 @@ import {
   ChevronDown,
   Sparkles,
   Building2,
+  LogOut,
 } from 'lucide-react';
 import { useCrm } from '../context/CrmContext';
 
@@ -38,7 +39,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   isOpen,
   onCloseMobile,
 }) => {
-  const { stats } = useCrm();
+  const { stats, logout } = useCrm();
 
   const handleNav = (view: string, sub?: string) => {
     onNavigate(view, sub);
@@ -408,13 +409,28 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </button>
         </nav>
 
-        {/* Footer info */}
-        <div className="p-3 border-t border-slate-800 text-[11px] text-slate-400 flex items-center justify-between">
-          <span>CRM Pro v2.4</span>
-          <span className="inline-flex items-center gap-1 text-emerald-400 font-medium">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            Online
-          </span>
+        {/* Footer info & Logout */}
+        <div className="p-3 border-t border-slate-800 text-[11px] text-slate-400 space-y-2">
+          <div className="flex items-center justify-between">
+            <span>CRM Pro v2.4</span>
+            <span className="inline-flex items-center gap-1 text-emerald-400 font-medium">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              Online
+            </span>
+          </div>
+
+          <button
+            id="btn-sidebar-logout"
+            type="button"
+            onClick={() => {
+              onCloseMobile();
+              logout();
+            }}
+            className="w-full py-1.5 px-2.5 rounded-lg bg-slate-800/80 hover:bg-rose-950/40 text-slate-400 hover:text-rose-400 border border-slate-700/50 flex items-center justify-center gap-2 transition-colors cursor-pointer text-xs"
+          >
+            <LogOut size={13} />
+            <span>Sair do Sistema</span>
+          </button>
         </div>
       </aside>
     </>

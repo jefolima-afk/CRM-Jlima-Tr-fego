@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PhoneCall, Search, Plus, Building2, Mail, Phone, Trash2, Edit2 } from 'lucide-react';
+import { PhoneCall, Search, Plus, Building2, Mail, Phone, Trash2, Edit2, UserCheck } from 'lucide-react';
 import { useCrm } from '../context/CrmContext';
 import { WhatsAppButton } from '../components/WhatsAppButton';
 
@@ -92,8 +92,26 @@ export const ContactsView: React.FC<ContactsViewProps> = ({ onSelectClient }) =>
       </div>
 
       {/* Grid of Contacts */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredContacts.map((cnt) => {
+      {filteredContacts.length === 0 ? (
+        <div className="py-16 text-center bg-white rounded-xl border border-slate-200 p-8">
+          <UserCheck size={40} className="mx-auto text-slate-300 mb-2" />
+          <h3 className="font-semibold text-slate-800 text-sm">Nenhum contato cadastrado</h3>
+          <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+            Cadastre os contatos e tomadores de decisão das empresas clientes.
+          </p>
+          {canEdit && (
+            <button
+              type="button"
+              onClick={() => setIsModalOpen(true)}
+              className="mt-4 inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition-colors"
+            >
+              <Plus size={15} /> Adicionar Primeiro Contato
+            </button>
+          )}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredContacts.map((cnt) => {
           const client = clients.find((c) => c.id === cnt.clientId);
           return (
             <div
@@ -160,6 +178,7 @@ export const ContactsView: React.FC<ContactsViewProps> = ({ onSelectClient }) =>
           );
         })}
       </div>
+      )}
 
       {/* Modal Novo Contato */}
       {isModalOpen && (

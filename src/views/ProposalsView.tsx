@@ -124,7 +124,18 @@ export const ProposalsView: React.FC<ProposalsViewProps> = ({ onSelectClient }) 
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-xs">
-              {filteredProposals.map((prp) => {
+              {filteredProposals.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="py-14 text-center text-slate-400">
+                    <FileText size={36} className="mx-auto text-slate-300 mb-2" />
+                    <div className="font-semibold text-slate-700 text-xs">Nenhuma proposta encontrada</div>
+                    <div className="text-[11px] text-slate-400 mt-0.5">
+                      Crie propostas e orçamentos comerciais para enviar aos seus clientes e leads.
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+                filteredProposals.map((prp) => {
                 const client = clients.find((c) => c.id === prp.clientId);
                 return (
                   <tr key={prp.id} className="hover:bg-slate-50">
@@ -195,7 +206,7 @@ export const ProposalsView: React.FC<ProposalsViewProps> = ({ onSelectClient }) 
                     </td>
                   </tr>
                 );
-              })}
+              }))}
             </tbody>
           </table>
         </div>

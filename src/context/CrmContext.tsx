@@ -44,6 +44,11 @@ interface CrmContextType {
   isAdmin: boolean;
   isViewer: boolean;
 
+  // Authentication
+  isAuthenticated: boolean;
+  login: (usernameOrEmail: string, password: string) => { success: boolean; error?: string };
+  logout: () => void;
+
   // Clients
   clients: Client[];
   addClient: (client: Omit<Client, 'id' | 'createdAt' | 'updatedAt' | 'whatsappNormalized'>) => Client;
@@ -139,7 +144,7 @@ interface CrmContextType {
   };
 }
 
-const STORAGE_KEY = 'crm_pro_database_v1';
+const STORAGE_KEY = 'crm_pro_database_v2';
 
 const CrmContext = createContext<CrmContextType | undefined>(undefined);
 
@@ -147,9 +152,28 @@ export const CrmProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Load state from localStorage or seed data
   const loadState = () => {
     try {
+      // Clear older version with mock/generic data if present
+      if (typeof window !== 'undefined' && localStorage.getItem('crm_pro_database_v1')) {
+        localStorage.removeItem('crm_pro_database_v1');
+      }
+
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        // Force single admin user with username 'admin' and password 'admin'
+        parsed.users = [
+          {
+            id: 'user-1',
+            name: 'Jeverson Lima',
+            username: 'admin',
+            email: 'jefo.lima@gmail.com',
+            password: 'admin',
+            role: 'admin',
+            roleLabel: 'Administrador',
+            avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
+          },
+        ];
+        return parsed;
       }
     } catch (e) {
       console.error('Error loading CRM database from localStorage', e);
@@ -172,6 +196,15 @@ export const CrmProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const initial = loadState();
+
+  const AUTH_STORAGE_KEY = 'crm_auth_session_v1';
+
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem(AUTH_STORAGE_KEY) === 'true';
+    }
+    return false;
+  });
 
   const [users, setUsers] = useState<User[]>(initial.users || INITIAL_USERS);
   const [currentUser, setCurrentUser] = useState<User>(initial.users?.[0] || INITIAL_USERS[0]);
@@ -808,9 +841,47 @@ export const CrmProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
   }, [clients, followUps, tasks, proposals, contracts]);
 
+  const login = (usernameOrEmail: string, pass: string): { success: boolean; error?: string } => {
+    const trimmedUser = usernameOrEmail.trim().toLowerCase();
+    const trimmedPass = pass.trim();
+
+    const adminUser = users.find((u) => u.role === 'admin') || INITIAL_USERS[0];
+    const isUserValid =
+      trimmedUser === 'admin' ||
+      trimmedUser === adminUser.email.toLowerCase() ||
+      trimmedUser === (adminUser.username?.toLowerCase() || 'admin') ||
+      trimmedUser === 'jeverson' ||
+      trimmedUser === 'jeverson lima';
+
+    const isPassValid =
+      trimmedPass === 'admin' ||
+      trimmedPass === (adminUser.password || 'admin');
+
+    if (isUserValid && isPassValid) {
+      setCurrentUser(adminUser);
+      setIsAuthenticated(true);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(AUTH_STORAGE_KEY, 'true');
+      }
+      return { success: true };
+    }
+
+    return { success: false, error: 'Usuário ou senha incorretos.' };
+  };
+
+  const logout = () => {
+    setIsAuthenticated(false);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem(AUTH_STORAGE_KEY);
+    }
+  };
+
   return (
     <CrmContext.Provider
       value={{
+        isAuthenticated,
+        login,
+        logout,
         currentUser,
         setCurrentUser,
         users,

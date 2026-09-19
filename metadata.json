@@ -1,0 +1,6 @@
+{
+  "name": "CRM Pro - Gestão Comercial e Clientes",
+  "description": "Sistema completo e profissional de CRM para gestão de clientes, leads, contatos, tarefas, follow-ups, pipeline comercial Kanban, projetos e arquivos.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
